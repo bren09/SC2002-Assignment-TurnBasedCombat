@@ -15,6 +15,7 @@ public abstract class Player extends Combatant{
         this.inventory = new ArrayList<>();
     }
 
+    // Skill-related Methods
     public void useSkill(List<Combatant> targets){
         if (isSkillReady()){
             executeSkillLogic(targets);
@@ -25,6 +26,7 @@ public abstract class Player extends Combatant{
     }
     public abstract void executeSkillLogic(List<Combatant> targets); 
 
+    // Item-related Methods
     public void useItem(int itemIndex, List<Combatant> targets){
         if (inventory.isEmpty()){
             System.out.println(name + " has no items to use.");
@@ -38,7 +40,6 @@ public abstract class Player extends Combatant{
         System.out.println(name + " uses " + item.getName() + ".");
         item.use(this, targets);
     }
-
     public void addItem(Item item){
         if (inventory.size() < 2){ 
             inventory.add(item);
@@ -52,16 +53,13 @@ public abstract class Player extends Combatant{
     public List<Item> getInventory() { return inventory; }
     public boolean hasItems() { return !inventory.isEmpty(); }
 
-    // Player specific methods //
-    // Reduce cooldown by 1 at end of each turn
+    // PlayerSkill-related Methods
     public void reduceCooldown() {
         if (currentSkillCooldown > 0) { currentSkillCooldown--; }
     }
-    // Check if class specific skill is ready
     public boolean isSkillReady() {
         return currentSkillCooldown == 0;
     }
-    // Start cooldown after using class specific skill
     public void startCooldown() {
         this.currentSkillCooldown = maxSkillCooldown;
     }

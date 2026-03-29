@@ -8,6 +8,6 @@ public class SmokeBomb implements Item {
 
     @Override
     public void use(Player user, List<Combatant> target) {
-        user.setInvulTurns(2); // Current and next turn
+        user.addEffect(new InvulEffect(2)); // Current and next turn
     }
 }

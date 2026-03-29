@@ -8,6 +8,10 @@ public class Potion implements Item {
 
     @Override
     public void use(Player user, List<Combatant> targets) {
+        if (targets.isEmpty()){
+            System.out.println("No heal targets.");
+            return;
+        }
         targets.get(0).heal(100);
     }
 }

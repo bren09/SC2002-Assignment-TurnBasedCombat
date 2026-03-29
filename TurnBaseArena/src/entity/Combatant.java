@@ -1,5 +1,8 @@
 package entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Combatant {
     // Protected access so that child classes can access these attributes directly but they are not accessible from outside the class hierarchy
 
@@ -11,15 +14,9 @@ public abstract class Combatant {
     protected int defense;
     protected int speed;
 
-    // Additional attributes
-    protected int invulTurns = 0; 
-    protected int defUp = 0;
-    protected int defTurns = 0;
-
     // Status effects
-    protected boolean isStunned;
-    protected int stunnedTurns = 0;
-    //protected List<StatusEffect> activeEffects;
+    protected  boolean isStunned = false;
+    protected List<StatusEffect> activeEffects;
 
     // Constructor for combatant with all attributes initialized
     // Take note that StatusEffect is not created yet, so code will not compile, hence the red underline.
@@ -31,11 +28,7 @@ public abstract class Combatant {
         this.defense = defense;
         this.speed = speed;
         this.isStunned = false;
-        this.stunnedTurns = 0;
-        this.invulTurns = 0;
-        this.defUp = 0;
-        this.defTurns = 0;
-        //this.activeEffects = new ArrayList<>();
+        this.activeEffects = new ArrayList<>();
     }
 
     // Logic for taking damage, applicable to all combatants, so it is implemented in the grandparent class.
@@ -60,67 +53,9 @@ public abstract class Combatant {
         System.out.println(name + " heals for " + (this.hp - oldHP) + " HP! (HP: " + oldHP + " -> " + this.hp + ")");
     }
 
-    //Invulnerability related methods
-    // Call this method at the end of each turn to reduce invul turns by 1
-    public void reduceInvulTurns() {
-        if (invulTurns > 0) {
-            invulTurns--;
-            System.out.println(name + " has " + invulTurns + " invulnerability turns left.");
-        }
-    }
-    // Method to set invul turns for smoke bomb item
-    public void setInvulTurns(int turns) {
-        this.invulTurns = turns;
-    }
-    // Method to check invul status
-    public boolean isInvul(){ return this.invulTurns>0;}
-
     // Boolean method to check if the combatant is still alive
     public boolean isAlive() {
         return this.hp > 0;
-    }
-
-    // Getter methods for BattleManager and TurnOrderManager
-    public int getSpeed() {return this.speed;}
-    public String getName() {return this.name;}
-    public int getHp() {return this.hp;}
-    public boolean isStunned() {return this.isStunned;}
-
-    // Stun-related methods
-    public void setStun(boolean hasActedThisRound){
-        this.stunnedTurns = hasActedThisRound ? 1:2;
-        this.isStunned = true;
-        System.out.println(name + " is stunned for " + stunnedTurns + " turn(s).");
-    }
-    public void reduceStunTurn(){
-        if (stunnedTurns>0){
-            stunnedTurns--;
-            if (stunnedTurns == 0){
-                isStunned = false;
-                System.out.println(name + " is not stunned anymore.");
-            }
-        }
-    }
-
-    // Defending-related methods
-    public void setDefend(){
-        this.defUp = 10;
-        this.defTurns = 2;
-        this.defense += defUp;
-        System.out.println(name + " takes a defensive state.");
-    }
-    public void reduceDefTurns(){
-        if (defTurns>0){
-            defTurns--;
-            if (defTurns==0){
-                this.defense -= defUp;
-                this.defUp = 0;
-                System.out.println(name + "'s defensive state has worn off.");
-            }
-        }
-    }
-    public boolean isDefending(){
-        return this.defTurns>0;
     }
 
     // Basic Attack Method
@@ -129,8 +64,50 @@ public abstract class Combatant {
         target.takeDamage(this.attack);
     }
 
+    // Status-related Methods
+    public void addEffect(StatusEffect effect){
+        // If duplicate effect, overwrites the existing one
+        activeEffects.removeIf(e -> e.getName().equals(effect.getName()));
+        activeEffects.add(effect);
+
+        if (effect instanceof DefendEffect){
+            adjustDef(10);
+            System.out.println(name + " takes a defensive stance, raising defence.");
+        } else if (effect instanceof StunEffect) {
+            this.isStunned = true;
+            System.out.println(name + " is now stunned.");
+        }
+    }
+
+    public void updateEffects(){
+        if (activeEffects.isEmpty()) return;
+        List<StatusEffect> statusToRemove = new ArrayList<>();
+        for (StatusEffect effect : activeEffects){
+            effect.apply(this);
+            effect.update(this);
+            if (effect.isExpired()){
+                statusToRemove.add(effect);
+            }
+        }
+        activeEffects.removeAll(statusToRemove);
+    }
+
+    public void setStunned(boolean stunned) { this.isStunned = stunned;}
+    public void adjustDef(int amount) { this.defense += amount; }
+    public boolean isInvul() { return activeEffects.stream().anyMatch(e -> e instanceof InvulEffect); }
+    public boolean isDefending() { return activeEffects.stream().anyMatch(e -> e instanceof DefendEffect); }
+
     // Abstract method for taking a turn, to be implemented by child class of Player and Enemy
     public abstract void takeTurn();
 
+    // Getter methods for BattleManager and TurnOrderManager
+    public int getSpeed() {return this.speed;}
+    public String getName() {return this.name;}
+    public int getHp() {return this.hp;}
+    public int getAttack() { return this.attack; }
+    public int getDefense() { return this.defense; }
+    public int getMaxHp() { return this.maxHp; }
+    public List<StatusEffect> getActiveEffects() { return activeEffects;}
+    public boolean isStunned() {return this.isStunned;}
     
 }

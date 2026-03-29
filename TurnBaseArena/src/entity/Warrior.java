@@ -17,9 +17,8 @@ public class Warrior extends Player {
         Combatant target = targets.get(0);
         System.out.println(this.getName() + " uses Shield Bash on " + target.getName() + "!");
         target.takeDamage(this.attack);
-        // hasActedThisRound is passed in by BattleManager for setStun
-        // Using placeholder 'false' for now
-        target.setStun(false);
+        // BattleManager should check for hasActedThisRound, and pass in 1 or 2 turns 
+        target.addEffect(new StunEffect(2));
     }
 
     @Override
