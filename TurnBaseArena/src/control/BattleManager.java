@@ -3,6 +3,9 @@ package control;
 import entity.*;
 import java.util.*;
 
+import boundary.GameUI;
+import boundary.InputMngr;
+
 /**
  * Controls the full game loop:
  *   loading screen → player setup → difficulty selection → battle rounds → end screen.
@@ -13,22 +16,29 @@ import java.util.*;
  *   - This gives StunEffect(2) exactly 2 missed turns when applied before the target acts,
  *     or 1 missed turn (via StunEffect(1) overwrite) when applied after the target already acted.
  */
-public class BattleManager {
 
-    private Player player;
+
+public class BattleManager {
+    // DO NOT TOUCH
+    // ========================================================================
+    private Player player; 
+    private final List<Item> savedItems = new ArrayList<>(); 
     private final List<Enemy> currentEnemies = new ArrayList<>();
     private final List<Enemy> backupEnemies  = new ArrayList<>();
     private boolean backupSpawned = false;
-
-    private final TurnOrderMngr turnOrderMngr = new SpeedBasedTurnOrder();
-    private final Scanner scanner = new Scanner(System.in);
-
     private int roundNumber = 0;
     private int difficulty;
-
-    // Tracks which combatants have already taken their turn this round.
-    // Used to fix Shield Bash stun duration.
     private final Set<Combatant> actedThisRound = new HashSet<>();
+
+    private final TurnOrderMngr turnOrderMngr = new SpeedBasedTurnOrder();
+    private final GameUI gameUI = new GameUI();
+    private final InputMngr inputMngr = new InputMngr();
+    private final ActionMngr actionMngr = new ActionMngr();
+    private final LevelMngr levelMngr = new LevelMngr();
+    // ========================================================================
+
+
+    // Everything beyond this point except runRound and runBattle belongs to other Classes.
 
     // =========================================================
     //  Entry point
@@ -87,11 +97,18 @@ public class BattleManager {
         for (int i = 1; i <= 2; i++) {
             System.out.println("Item " + i + ":  1. Potion   2. Power Stone   3. Smoke Bomb");
             int itemChoice = getIntInput(1, 3);
-            switch (itemChoice) {
-                case 1 -> player.addItem(new Potion());
-                case 2 -> player.addItem(new PowerStone());
-                case 3 -> player.addItem(new SmokeBomb());
+            Item chosen = switch (itemChoice){
+                case 1 -> new Potion();
+                case 2 -> new PowerStone();
+                case 3 -> new SmokeBomb();
+                default -> { System.out.println("Invalid item"); yield null;}
+            };
+
+            if (chosen != null){
+                player.addItem(chosen);
+                savedItems.add(chosen);
             }
+
         }
     }
 
@@ -193,7 +210,6 @@ public class BattleManager {
             if (combatant.isStunned()) {
                 System.out.println("\n" + combatant.getName() + " is STUNNED and cannot act this turn!");
                 combatant.updateEffects(); // tick effects even on a skipped turn
-                actedThisRound.add(combatant);
                 continue;
             }
 
@@ -432,6 +448,7 @@ public class BattleManager {
                 // without storing them — simplest: create fresh player with same type)
                 String savedName = player.getName();
                 player = (player instanceof Warrior) ? new Warrior(savedName) : new Wizard(savedName);
+                for (Item item : savedItems) player.addItem(item);
                 spawnInitialEnemies();
                 runBattle();
             }
