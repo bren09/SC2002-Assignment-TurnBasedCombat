@@ -3,42 +3,28 @@ package control;
 import entity.*;
 import java.util.*;
 
-import boundary.GameUI;
-import boundary.InputMngr;
-
 /**
  * Controls the full game loop:
  *   loading screen → player setup → difficulty selection → battle rounds → end screen.
- *
  * Turn / effect timing rules:
  *   - Cooldown reduces at the START of the player's turn (skipped if stunned).
  *   - updateEffects() is called at the END of each combatant's turn (even when stunned).
  *   - This gives StunEffect(2) exactly 2 missed turns when applied before the target acts,
  *     or 1 missed turn (via StunEffect(1) overwrite) when applied after the target already acted.
  */
-
-
 public class BattleManager {
-    // DO NOT TOUCH
-    // ========================================================================
-    private Player player; 
-    private final List<Item> savedItems = new ArrayList<>(); 
+    private Player player;
     private final List<Enemy> currentEnemies = new ArrayList<>();
-    private final List<Enemy> backupEnemies  = new ArrayList<>();
-    private boolean backupSpawned = false;
-    private int roundNumber = 0;
-    private int difficulty;
-    private final Set<Combatant> actedThisRound = new HashSet<>();
-
     private final TurnOrderMngr turnOrderMngr = new SpeedBasedTurnOrder();
-    private final GameUI gameUI = new GameUI();
-    private final InputMngr inputMngr = new InputMngr();
-    private final ActionMngr actionMngr = new ActionMngr();
-    private final LevelMngr levelMngr = new LevelMngr();
-    // ========================================================================
+    private final SpawnManager spawnManager   = new SpawnManager();
+    private final LevelManager levelManager   = new LevelManager(spawnManager);
+    private final Scanner scanner = new Scanner(System.in);
 
+    private int roundNumber = 0;
 
-    // Everything beyond this point except runRound and runBattle belongs to other Classes.
+    // Tracks which combatants have already taken their turn this round.
+    // Used to fix Shield Bash stun duration.
+    private final Set<Combatant> actedThisRound = new HashSet<>();
 
     // =========================================================
     //  Entry point
@@ -97,53 +83,26 @@ public class BattleManager {
         for (int i = 1; i <= 2; i++) {
             System.out.println("Item " + i + ":  1. Potion   2. Power Stone   3. Smoke Bomb");
             int itemChoice = getIntInput(1, 3);
-            Item chosen = switch (itemChoice){
-                case 1 -> new Potion();
-                case 2 -> new PowerStone();
-                case 3 -> new SmokeBomb();
-                default -> { System.out.println("Invalid item"); yield null;}
-            };
-
-            if (chosen != null){
-                player.addItem(chosen);
-                savedItems.add(chosen);
+            switch (itemChoice) {
+                case 1 -> player.addItem(new Potion());
+                case 2 -> player.addItem(new PowerStone());
+                case 3 -> player.addItem(new SmokeBomb());
             }
-
         }
     }
 
     private void chooseDifficulty() {
         System.out.println("\nSelect difficulty:  1. Easy   2. Medium   3. Hard");
-        difficulty = getIntInput(1, 3);
+        int choice = getIntInput(1, 3);
+        levelManager.setDifficulty(Difficulty.fromChoice(choice));
         spawnInitialEnemies();
     }
 
     private void spawnInitialEnemies() {
         currentEnemies.clear();
-        backupEnemies.clear();
-        backupSpawned = false;
+        levelManager.reset();
 
-        switch (difficulty) {
-            case 1 -> {
-                currentEnemies.add(new Goblin("Goblin A"));
-                currentEnemies.add(new Goblin("Goblin B"));
-                currentEnemies.add(new Goblin("Goblin C"));
-                // no backup
-            }
-            case 2 -> {
-                currentEnemies.add(new Goblin("Goblin"));
-                currentEnemies.add(new Wolf("Wolf A"));
-                backupEnemies.add(new Wolf("Wolf B"));
-                backupEnemies.add(new Wolf("Wolf C"));
-            }
-            case 3 -> {
-                currentEnemies.add(new Goblin("Goblin A"));
-                currentEnemies.add(new Goblin("Goblin B"));
-                backupEnemies.add(new Goblin("Goblin C"));
-                backupEnemies.add(new Wolf("Wolf A"));
-                backupEnemies.add(new Wolf("Wolf B"));
-            }
-        }
+        currentEnemies.addAll(levelManager.spawnInitialWave());
 
         System.out.println("\nEnemies appear!");
         for (Enemy e : currentEnemies) {
@@ -162,11 +121,10 @@ public class BattleManager {
         while (player.isAlive()) {
             // Backup spawn: triggered at the start of a round once the initial wave is cleared
             if (currentEnemies.isEmpty()) {
-                if (!backupSpawned && !backupEnemies.isEmpty()) {
-                    backupSpawned = true;
+                List<Enemy> backup = levelManager.spawnBackupWave();
+                if (!backup.isEmpty()) {
                     System.out.println("\n!!! BACKUP ENEMIES ARRIVE !!!");
-                    currentEnemies.addAll(backupEnemies);
-                    backupEnemies.clear();
+                    currentEnemies.addAll(backup);
                     for (Enemy e : currentEnemies) {
                         System.out.println("  - " + e.getName() + " (HP: " + e.getHp() + ")");
                     }
@@ -210,6 +168,7 @@ public class BattleManager {
             if (combatant.isStunned()) {
                 System.out.println("\n" + combatant.getName() + " is STUNNED and cannot act this turn!");
                 combatant.updateEffects(); // tick effects even on a skipped turn
+                actedThisRound.add(combatant);
                 continue;
             }
 
@@ -444,23 +403,18 @@ public class BattleManager {
         switch (getIntInput(1, 3)) {
             case 1 -> {
                 roundNumber = 0;
-                // Restore player HP and items (replay same class/name/items not possible
-                // without storing them — simplest: create fresh player with same type)
                 String savedName = player.getName();
                 player = (player instanceof Warrior) ? new Warrior(savedName) : new Wizard(savedName);
-                for (Item item : savedItems) player.addItem(item);
-                spawnInitialEnemies();
+                spawnInitialEnemies(); // uses LevelManager with same difficulty
                 runBattle();
             }
             case 2 -> startGame();
             case 3 -> System.out.println("Thanks for playing!");
         }
     }
-
     // =========================================================
     //  Input utility
     // =========================================================
-
     private int getIntInput(int min, int max) {
         while (true) {
             System.out.print("> ");
