@@ -196,9 +196,8 @@ public class BattleManager {
     // =========================================================
 
     private void runPlayerTurn(Player p) {
-        p.reduceCooldown(); // cooldown only ticks on turns the player actually takes
+        boolean actionTaken = false;        
 
-        boolean actionTaken = false;
         while (!actionTaken) {
             System.out.println("\n[" + p.getName() + "'s Turn]  HP: " + p.getHp() + "/" + p.getMaxHp());
             printPlayerStatus(p);
@@ -242,6 +241,8 @@ public class BattleManager {
                 }
             }
         }
+        p.reduceCooldown(); // cooldown only ticks on turns the player actually takes
+
     }
 
     private void executePlayerSkill(Player p) {
@@ -380,7 +381,7 @@ public class BattleManager {
 
         System.out.println("\n╔══════════════════════════════════════════╗");
         System.out.println("║   CONGRATULATIONS! YOU HAVE WON!         ║");
-        System.out.println("║   You have defeated all your enemies.     ║");
+        System.out.println("║   You have defeated all your enemies.    ║");
         System.out.println("╚══════════════════════════════════════════╝");
         System.out.println("  Remaining HP  : " + player.getHp() + "/" + player.getMaxHp());
         System.out.println("  Total Rounds  : " + roundNumber);
