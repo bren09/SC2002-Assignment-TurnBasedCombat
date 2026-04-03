@@ -75,7 +75,5 @@ public abstract class Player extends Combatant{
     public boolean hasItem(Item item) {
     return inventory.contains(item);
     }
-    public void increaseAttack(int amount) {
-    setAttack(getAttack() + amount);
-    }
+    
 }
