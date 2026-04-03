@@ -3,7 +3,7 @@ package control;
 import java.util.List;
 
 import javax.swing.plaf.basic.BasicComboBoxUI.ItemHandler;
-public class ActionManager{
+public class ActionMngr{
     // main method used by the Battle Engine when player takes a turn
     public void executeAction(ActionType actionType, Player player, Combatant target, Item item, List<Combatant> enemies){
         // if enemy is dead, do nothing
