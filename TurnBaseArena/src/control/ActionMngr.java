@@ -96,7 +96,7 @@ public class ActionMngr{
      }
      
      //normal special skill usage
-     public void useSpecialSkill(Player player, Combatant combatant, List<Combatant> enemies, boolean startCooldown){
+     public void executeSkill(Player player, Combatant combatant, List<Combatant> enemies, boolean startCooldown){
         if(player == null || !player.isAlive()){
             return;
         }
