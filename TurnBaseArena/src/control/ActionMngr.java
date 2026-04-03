@@ -96,7 +96,7 @@ public class ActionMngr{
      }
      
      //normal special skill usage
-     public void executeSkillLogic(Player player, Combatant combatant, List<Combatant> enemies, boolean startCooldown){
+     public void useSpecialSkill(Player player, Combatant combatant, List<Combatant> enemies, boolean startCooldown){
         if(player == null || !player.isAlive()){
             return;
         }
@@ -131,7 +131,7 @@ public class ActionMngr{
         }
      }
      //helper method  for warriros shieldbash
-     public void applyShieldBash(Player warrior, Combatant target){
+     public void executeSkillLogic(Player warrior, Combatant target){
         if(warrior == null || target == null || !target.isAlive() || !warrior.isAlive()){
             return;
         }
@@ -145,7 +145,7 @@ public class ActionMngr{
     }
 
     //helper method for wizards arcane blast
-    public void applyArcaneBlast(Player wizard, List<Combatant> enemies){
+    public void executeSkillLogic(Player wizard, List<Combatant> enemies){
         if(wizard == null || enemies == null || !wizard.isAlive()){
             return;
         }
