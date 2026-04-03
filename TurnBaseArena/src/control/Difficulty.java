@@ -1,9 +1,5 @@
 package control;
 
-/**
- * Enumerates the difficulty levels of the game.
- * Each level determines enemy wave composition and whether backup waves are present.
- */
 public enum Difficulty {
     EASY(1, "Easy"),
     MEDIUM(2, "Medium"),
