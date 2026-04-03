@@ -20,7 +20,7 @@ public class ActionMngr{
                 defend(player);
                 break;
 
-            case Item:
+            case ITEM:
                 useItem(player, item);
                 break;
 
