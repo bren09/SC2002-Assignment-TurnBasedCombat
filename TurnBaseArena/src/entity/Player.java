@@ -72,4 +72,10 @@ public abstract class Player extends Combatant{
     public int getSkillCooldown(){
         return currentSkillCooldown;
     }
+    public boolean hasItem(Item item) {
+    return inventory.contains(item);
+    }
+    public void increaseAttack(int amount) {
+    setAttack(getAttack() + amount);
+    }
 }
