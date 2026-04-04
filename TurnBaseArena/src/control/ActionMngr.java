@@ -22,18 +22,14 @@ public class ActionMngr{
         player.useSkill(targets);
         if (player instanceof Warrior){
             Combatant target = targets.get(0);
-            if (actedThisRound.contains(target)){
-                target.getActiveEffects().stream()
-                .filter(e -> e instanceof StunEffect)
-                .forEach(e -> ((StunEffect) e).setDuration(1));
+            if (target.isAlive() && actedThisRound.contains(target)){
+                target.addEffect(new StunEffect(1));
             }
         }
     }
 
-    public void executeEnemyMove(Enemy enemy, List<Player> party){
-        if (enemy.isStunned() || !enemy.isAlive()) return;
-
-        Player target = party.get((int) (Math.random()*party.size()));
-        if (target.isAlive()){ enemy.enemyAI(target); }
+    public void executeEnemyMove(Enemy enemy, Player player){
+        if (!enemy.isAlive() || !player.isAlive()) return;
+        enemy.enemyAI(player);
     }
 }

@@ -8,7 +8,6 @@ public abstract class Player extends Combatant{
     protected int currentSkillCooldown = 0; // Track cooldown of class specific skill
     protected final int maxSkillCooldown = 3; // Class skills cooldown is 3 turns
     protected List<Item> inventory; // Inventory for holding items
-    protected boolean skillUsed = false;
 
     // Constructor for Player, calls the constructor of Combatant to initialize common attributes
     public Player(String name, int hp, int attack, int defense, int speed){
@@ -21,7 +20,6 @@ public abstract class Player extends Combatant{
         if (isSkillReady()){
             executeSkillLogic(targets);
             startCooldown();
-            this.skillUsed = true;
         } else {
             System.out.println("Skill is on cooldown for " + currentSkillCooldown + " more turns!");
         }
@@ -57,10 +55,6 @@ public abstract class Player extends Combatant{
 
     // PlayerSkill-related Methods
     public void reduceCooldown() {
-        if (skillUsed){
-               skillUsed = false;
-               return; 
-        }
         if (currentSkillCooldown > 0) { currentSkillCooldown--; }
     }
     public boolean isSkillReady() {
