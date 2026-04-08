@@ -48,7 +48,7 @@ public class BattleManager {
                 case 1 -> new Potion();
                 case 2 -> new PowerStone();
                 case 3 -> new SmokeBomb();
-                default -> null;
+                default -> throw new IllegalStateException("Invalid item choice");
             };
             player.addItem(item);
             saveItems.add(item);
@@ -75,6 +75,7 @@ public class BattleManager {
             ui.showRoundHeader(roundNumber);
 
             List<Combatant> order = turnOrderMngr.determineTurnOrder(getAllCombatants());
+            ui.showTurnorder(order);
             actedThisRound.clear();
 
             for (Combatant c : order){
@@ -129,7 +130,7 @@ public class BattleManager {
                 case 2 -> ActionType.DEFEND;
                 case 3 -> ActionType.SPECIAL_SKILL;
                 case 4 -> ActionType.ITEM;
-                default -> null;
+                default -> throw new IllegalStateException("Invalid Action");
             };
 
             if (type == ActionType.SPECIAL_SKILL && !p.isSkillReady()){

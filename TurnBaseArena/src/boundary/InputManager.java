@@ -8,7 +8,7 @@ public class InputManager {
 
     private final Scanner sc = new Scanner(System.in);
 
-    // Generic input with validation
+    // Generic input with validation. we allow system prints here as an exception
     public int getIntInput(int min, int max){
         int choice;
         while (true){

@@ -74,6 +74,18 @@ public class GameUI {
         System.out.println("\n" + c.getName() + " is stunned and unable to act.");
     }
 
+    public void showTurnorder(List<Combatant> o){
+        System.out.print("Turn Order: ");
+        for (int i = 0; i < o.size(); i++){
+            Combatant c = o.get(i);
+            System.out.print(c.getName() + " (SPD:" + c.getSpeed() +")");
+            if (i<o.size() - 1){
+                System.out.print(" -> ");
+            }
+        }
+        System.out.println();
+    }
+
     public void showPlayerStatus(Player p){
         System.out.println("\nPlayer Status:");
         System.out.println(p.getName() +
