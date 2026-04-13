@@ -21,12 +21,6 @@ public enum Difficulty {
         return label;
     }
 
-    /**
-     * Converts a user-selected integer (1-3) to the corresponding Difficulty.
-     * @param choice the integer choice from user input
-     * @return the matching Difficulty
-     * @throws IllegalArgumentException if the choice does not map to any difficulty
-     */
     public static Difficulty fromChoice(int choice) {
         for (Difficulty d : values()) {
             if (d.value == choice) return d;

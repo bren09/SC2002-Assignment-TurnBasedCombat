@@ -1,63 +1,27 @@
-## Getting Started
+Turn-Based Combat Arena (Java OOP) 
 
-SpawnManager — takes over spawnInitialEnemies():
+HOW TO RUN:
 
-SpawnManager
-  + createGoblin(String name) : Goblin
-  + createWolf(String name) : Wolf
-  + createInitialWave(int difficulty) : List<Enemy>
-  + createBackupWave(int difficulty) : List<Enemy>
+Prerequisites: 
+- Java Development Kit (JDK): JavaSE-25
 
+Compilation:
+1. Navigate to root folder of project directory
+2. Compile the Java files:
+          javac -d bin -sourcepath src src/Main.java
+3. Run the compiled program:
+          java -cp bin Main
 
-LevelManager — owns difficulty config and calls SpawnManager:
+Project Structure:
+src/
+├── boundary/    # UI and Input
+├── control/     # Logic and Managers
+├── entity/      # Data Objects
+└── main/        # Entry Point
 
-LevelManager
-  + getLevelConfig(int difficulty) : LevelConfig  
-  + getInitialEnemies(int difficulty) : List<Enemy>
-  + getBackupEnemies(int difficulty) : List<Enemy>
-  + hasBackup(int difficulty) : boolean
-
-
-ActionManager — takes over runPlayerTurn(), executePlayerSkill(), useItemMenu():
-
-ActionManager
-  + executeBasicAttack(Player p, Enemy target)
-  + executeSkill(Player p, List<Combatant> targets, Set<Combatant> actedThisRound)
-  + executeDefend(Player p)
-  + executeItem(Player p, int index, List<Combatant> targets)
-
-
-GameUI — takes over all System.out.println() calls:
-
-GameUI
-  + showLoadingScreen()
-  + showRoundHeader(int round)
-  + showPlayerStatus(Player p)
-  + showEnemyStatus(List<Enemy> enemies)
-  + showRoundEndStatus(Player p, List<Enemy> enemies, int round)
-  + showVictoryScreen(Player p, int rounds)
-  + showDefeatScreen(int enemiesRemaining, int rounds)
-  + showActionMenu(Player p)
-  + showItemMenu(List<Item> items)
-  + showEnemyList(List<Enemy> enemies)
-
-
-InputManager — takes over getIntInput() and all scanner calls:
-
-InputManager
-  + getIntInput(int min, int max) : int
-  + getPlayerName() : String
-  + getClassChoice() : int
-  + getItemChoice() : int
-  + getDifficultyChoice() : int
-  + getActionChoice(Player p) : int
-  + getTargetChoice(List<Enemy> alive) : Enemy
-
-
-BattleManager — keeps only the orchestration:
-
-BattleManager
-  - runBattle()
-  - runRound()
-  - checkBackupSpawn()
-  - checkWinLoss() : boolean
+Contributors:
+Brendon Cheng Wei Cheong
+Choo Xun De
+Bajoria Vidisha
+Bryan Lee Chong Han
+Bendagiri Matam Pranav
