@@ -15,14 +15,17 @@ Compilation:
 
 Project Structure:
 src/
-├── boundary/    # UI and Input
-├── control/     # Logic and Managers
-├── entity/      # Data Objects
-└── main/        # Entry Point
+- ├── boundary/    # UI and Input
+- ├── control/     # Logic and Managers
+- ├── entity/      # Data Objects
+- └── main/        # Entry Point
+
+UML Sequence Diagram: https://drive.google.com/file/d/1XkkiQ4WKm7A0wFHmA1EjI2j9yHxmD0dE/view?usp=sharing
+UML Class Diagram: https://drive.google.com/file/d/1lSscbvTzxqhBpf_ZeSORw4fBubJHIack/view?usp=sharing
 
 Contributors:
-Brendon Cheng Wei Cheong
-Choo Xun De
-Bajoria Vidisha
-Bryan Lee Chong Han
-Bendagiri Matam Pranav
+- Brendon Cheng Wei Cheong
+- Choo Xun De
+- Bajoria Vidisha
+- Bryan Lee Chong Han
+- Bendagiri Matam Pranav
